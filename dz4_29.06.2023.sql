@@ -145,6 +145,15 @@ WHERE cats.name IN ("Murzik", "Zuza")) AS res
 ON res.shops_id = shops.id
 WHERE shops_id IS NULL;
 
+-- Решение преподавателя (НЕВЕРНЫЙ РЕЗУЛЬТАТ. Требует доработки)
+SELECT s.shopname, GROUP_CONCAT(c.name)
+FROM shops s
+JOIN cats c on s.id = c.shops_id
+GROUP BY s.shopname
+HAVING GROUP_CONCAT(c.name) NOT LIKE '%Murzik%'
+AND GROUP_CONCAT(c.name) NOT LIKE '%Zuza%';
+
+
 -- 4. Вывести название и цену для всех анализов, которые продавались 5 февраля 2020 и всю следующую неделю
 
 SELECT a.an_name, a.an_price, o.ord_datetime FROM Analysis a
@@ -152,3 +161,13 @@ JOIN Orders o
 ON o.ord_an = a.an_id
 WHERE o.ord_datetime BETWEEN '2020-02-05' AND '2020-02-12 23:59:59'
 ORDER BY o.ord_datetime;
+
+-- Решение преподавателя
+SELECT DATE (O.ord_datetime) ord_date, GA.gr_name, A.an_name, A.an_price
+FROM Analysis A
+JOIN Orders O 
+ON A.an_id = O.ord_an
+JOIN GroupsAn GA 
+ON A.an_id = GA.gr_id
+WHERE DATE(O.ord_datetime) BETWEEN '2020-02-05' AND '2020-02-05' + INTERVAL 1 WEEK
+ORDER BY O.ord_datetime;
